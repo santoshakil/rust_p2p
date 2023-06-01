@@ -15,7 +15,7 @@ fn main() {
     let noise_config = noise::Config::new(&local_key).unwrap();
 
     let trns = tcp::async_io::Transport::default()
-        .upgrade(Version::V1Lazy)
+        .upgrade(Version::V1)
         .authenticate(noise_config)
         .multiplex(yamux::Config::default())
         .boxed();
