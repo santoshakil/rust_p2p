@@ -31,6 +31,8 @@ fn main() {
     swarm
         .listen_on("/ip4/0.0.0.0/tcp/0".parse().unwrap())
         .unwrap();
+
+    println!("{:?}", swarm.network_info());
 }
 
 #[derive(NetworkBehaviour, Default)]
