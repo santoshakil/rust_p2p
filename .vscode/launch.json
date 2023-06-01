@@ -1,0 +1,33 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug executable 'rust_p2p'",
+      "cargo": {
+        "args": ["build", "--bin=rust_p2p", "--package=rust_p2p"],
+        "filter": {
+          "name": "rust_p2p",
+          "kind": "bin"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in executable 'rust_p2p'",
+      "cargo": {
+        "args": ["test", "--no-run", "--bin=rust_p2p", "--package=rust_p2p"],
+        "filter": {
+          "name": "rust_p2p",
+          "kind": "bin"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}
