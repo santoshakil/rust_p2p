@@ -15,9 +15,9 @@ impl KeyPair {
         libp2p::PeerId::from_public_key(&pk)
     }
 
-    pub fn inner(&self) -> libp2p::identity::Keypair {
-        self.0.clone().into()
-    }
+    // pub fn inner(&self) -> libp2p::identity::Keypair {
+    //     self.0.clone().into()
+    // }
 }
 
 impl Serialize for KeyPair {

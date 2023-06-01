@@ -1,10 +1,8 @@
-pub mod keypair;
+mod keypair;
 
 use libp2p::PeerId;
 
-use crate::keypair::KeyPair;
-
 fn main() {
-    let peer_id: PeerId = KeyPair::generate().peer_id();
+    let peer_id: PeerId = crate::keypair::KeyPair::generate().peer_id();
     println!("Peer ID: {:?}", peer_id);
 }
