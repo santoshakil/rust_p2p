@@ -5,9 +5,10 @@ edition = "2021"
 
 
 [dependencies]
-async-std = "1.12.0"
+async-std = { version = "1.12.0", features = ["attributes"] }
+async-trait = "0.1.68"
 futures = "0.3.28"
-libp2p = {version = "0.51.3", features = ["async-std", "dns", "macros", "noise", "ping", "tcp", "websocket", "yamux"] }
+libp2p = {version = "0.51.3", features = ["async-std", "gossipsub", "mdns", "dns", "macros", "noise", "ping", "tcp", "websocket", "yamux"] }
 libp2p-quic = "0.6.1"
 serde = "1.0.163"
 tokio = "1.28.2"
