@@ -1,60 +1,23 @@
+mod behaviour;
+mod config;
+
 use async_std::io;
 use futures::{prelude::*, select};
 use libp2p::{
-    core::upgrade::Version,
-    gossipsub, identity, mdns, noise,
-    swarm::NetworkBehaviour,
+    gossipsub, mdns,
     swarm::{SwarmBuilder, SwarmEvent},
-    tcp, yamux, PeerId, Transport,
+    PeerId,
 };
 use std::error::Error;
-use std::hash::{Hash, Hasher};
-use std::time::Duration;
-use std::{collections::hash_map::DefaultHasher, str::FromStr};
+use std::str::FromStr;
 
-#[derive(NetworkBehaviour)]
-struct MyBehaviour {
-    gossipsub: gossipsub::Behaviour,
-    mdns: mdns::async_io::Behaviour,
-}
+use crate::behaviour::MyBehaviourEvent;
 
 #[async_std::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    let id_keys = identity::Keypair::generate_ed25519();
-    let local_peer_id = PeerId::from(id_keys.public());
-    println!("Local peer id: {}", local_peer_id);
+    let (local_peer_id, trns, behaviour, topic) = config::configure_swarm()?;
 
-    let noise_config = noise::Config::new(&id_keys)?;
-    let trns = tcp::async_io::Transport::default()
-        .upgrade(Version::V1)
-        .authenticate(noise_config)
-        .multiplex(yamux::Config::default())
-        .boxed();
-
-    let message_id_fn = |message: &gossipsub::Message| {
-        let mut s = DefaultHasher::new();
-        message.data.hash(&mut s);
-        gossipsub::MessageId::from(s.finish().to_string())
-    };
-
-    let gossipsub_config = gossipsub::ConfigBuilder::default()
-        .heartbeat_interval(Duration::from_secs(10))
-        .validation_mode(gossipsub::ValidationMode::Strict)
-        .message_id_fn(message_id_fn)
-        .build()?;
-
-    let mut gossipsub = gossipsub::Behaviour::new(
-        gossipsub::MessageAuthenticity::Signed(id_keys),
-        gossipsub_config,
-    )?;
-    let topic = gossipsub::IdentTopic::new("test-net");
-    gossipsub.subscribe(&topic)?;
-
-    let mut swarm = {
-        let mdns = mdns::async_io::Behaviour::new(mdns::Config::default(), local_peer_id)?;
-        let behaviour = MyBehaviour { gossipsub, mdns };
-        SwarmBuilder::with_async_std_executor(trns, behaviour, local_peer_id).build()
-    };
+    let mut swarm = SwarmBuilder::with_async_std_executor(trns, behaviour, local_peer_id).build();
 
     let mut stdin = io::BufReader::new(io::stdin()).lines().fuse();
 
