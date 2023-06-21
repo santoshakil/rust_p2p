@@ -7,10 +7,10 @@ use libp2p::{
     swarm::{SwarmBuilder, SwarmEvent},
     tcp, yamux, PeerId, Transport,
 };
-use std::collections::hash_map::DefaultHasher;
 use std::error::Error;
 use std::hash::{Hash, Hasher};
 use std::time::Duration;
+use std::{collections::hash_map::DefaultHasher, str::FromStr};
 
 #[derive(NetworkBehaviour)]
 struct MyBehaviour {
@@ -67,7 +67,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
     loop {
         select! {
             line = stdin.select_next_some() => {
-                if let Err(e) = swarm
+                if let Some(peer_id_str) = line.as_ref().expect("Stdin not to close").strip_prefix("PeerID: ") {
+                    let peer_id = PeerId::from_str(peer_id_str.trim())?;
+                    swarm.dial(peer_id)?;
+                } else if let Err(e) = swarm
                     .behaviour_mut().gossipsub
                     .publish(topic.clone(), line.expect("Stdin not to close").as_bytes()) {
                     println!("Publish error: {e:?}");
