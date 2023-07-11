@@ -22,7 +22,7 @@ pub fn configure_swarm() -> Result<
 > {
     let id_keys = identity::Keypair::generate_ed25519();
     let local_peer_id = PeerId::from(id_keys.public());
-    println!("Local peer PeerID: {}", local_peer_id);
+    println!("Local PeerID: {}", local_peer_id);
 
     let noise_config = noise::Config::new(&id_keys)?;
     let trns = tcp::async_io::Transport::default()
